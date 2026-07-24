@@ -57,7 +57,7 @@ export function addFormSheets(
           : "OK",
     };
     for (const field of sortedFields) {
-      row[field.id] = formatCellValue(data[field.id]);
+      row[field.id] = formatFieldCellValue(field, data[field.id]);
     }
     const addedRow = sheet.addRow(row);
     if (submission.flagged) {
@@ -158,6 +158,44 @@ function uniqueSheetName(workbook: ExcelJS.Workbook, rawName: string): string {
   }
   // Astronomically unlikely fallback — still guarantees uniqueness.
   return base.slice(0, 20) + Date.now().toString().slice(-8);
+}
+
+function formatFieldCellValue(field: FormField, value: unknown): string {
+  if (field.type === "yes_no") {
+    const payload = value as
+      | { enabled?: boolean; details?: unknown[] | Record<string, unknown> }
+      | undefined;
+    const enabled = payload?.enabled === true;
+    if (!enabled) return "No";
+
+    const entries = Array.isArray(payload?.details)
+      ? payload.details
+      : payload?.details && typeof payload.details === "object"
+        ? [payload.details]
+        : [];
+
+    if (!entries.length) return "Yes";
+
+    const orderedLabels = Array.isArray(field.options)
+      ? field.options.filter((item): item is string => typeof item === "string")
+      : ["Name", "Class"];
+    const renderedEntries = entries.map((entry, index) => {
+      const record =
+        entry && typeof entry === "object" ? (entry as Record<string, unknown>) : {};
+      const parts = orderedLabels
+        .map((label: string) => {
+          const text = formatCellValue(record[label]);
+          return text ? `${label}: ${text}` : null;
+        })
+        .filter((item): item is string => Boolean(item));
+
+      return `Student ${index + 1}: ${parts.join(" | ")}`;
+    });
+
+    return `Yes — ${renderedEntries.join("; ")}`;
+  }
+
+  return formatCellValue(value);
 }
 
 function formatCellValue(value: unknown): string {
