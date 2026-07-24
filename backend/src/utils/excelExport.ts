@@ -34,9 +34,10 @@ export function addFormSheets(
   // ---------- Submissions sheet ----------
   const sheetName = uniqueSheetName(workbook, `Submissions - ${form.title}`);
   const sheet = workbook.addWorksheet(sheetName);
+  const exportColumns = buildSubmissionColumns(sortedFields, submissions);
 
   sheet.columns = [
-    ...sortedFields.map((f) => ({ header: f.label, key: f.id, width: 22 })),
+    ...exportColumns,
     { header: "Submitted At", key: "__submittedAt", width: 20 },
     { header: "Status", key: "__status", width: 14 },
   ];
@@ -57,7 +58,25 @@ export function addFormSheets(
           : "OK",
     };
     for (const field of sortedFields) {
-      row[field.id] = formatFieldCellValue(field, data[field.id]);
+      if (String(field.type) === "yes_no") {
+        const payload = data[field.id] as
+          | { enabled?: boolean; details?: unknown[] | Record<string, unknown> }
+          | undefined;
+        const entries = normalizeYesNoEntries(payload?.details);
+        row[field.id] = payload?.enabled === true ? "Yes" : "No";
+
+        entries.forEach((entry, index) => {
+          const orderedLabels = getOrderedYesNoLabels(field);
+          orderedLabels.forEach((label) => {
+            const key = buildYesNoDetailKey(field.id, index, label);
+            row[key] = formatCellValue(
+              (entry as Record<string, unknown>)[label],
+            );
+          });
+        });
+      } else {
+        row[field.id] = formatFieldCellValue(field, data[field.id]);
+      }
     }
     const addedRow = sheet.addRow(row);
     if (submission.flagged) {
@@ -149,6 +168,75 @@ export function addFormSheets(
 // This matters here because a single event export can include multiple
 // forms — and two forms easily end up with similar or identical titles,
 // e.g. one duplicated from another without renaming ("Registration (Copy)").
+function buildSubmissionColumns(
+  fields: FormField[],
+  submissions: Submission[],
+): Array<{ header: string; key: string; width: number }> {
+  const columns: Array<{ header: string; key: string; width: number }> = [];
+
+  for (const field of fields) {
+    if (String(field.type) === "yes_no") {
+      columns.push({ header: field.label, key: field.id, width: 20 });
+
+      const orderedLabels = getOrderedYesNoLabels(field);
+      const maxEntries = Math.max(
+        1,
+        ...submissions.map((submission) => {
+          const data = submission.data as Record<string, unknown>;
+          const payload = data[field.id] as
+            | {
+                enabled?: boolean;
+                details?: unknown[] | Record<string, unknown>;
+              }
+            | undefined;
+          return normalizeYesNoEntries(payload?.details).length;
+        }),
+      );
+
+      for (let index = 0; index < maxEntries; index++) {
+        for (const label of orderedLabels) {
+          columns.push({
+            header: `${field.label} • Student ${index + 1} • ${label}`,
+            key: buildYesNoDetailKey(field.id, index, label),
+            width: 22,
+          });
+        }
+      }
+      continue;
+    }
+
+    columns.push({ header: field.label, key: field.id, width: 22 });
+  }
+
+  return columns;
+}
+
+function buildYesNoDetailKey(fieldId: string, index: number, label: string) {
+  return `${fieldId}__${index}__${label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`;
+}
+
+function getOrderedYesNoLabels(field: FormField): string[] {
+  return Array.isArray(field.options)
+    ? field.options.filter((item): item is string => typeof item === "string")
+    : ["Name", "Class"];
+}
+
+function normalizeYesNoEntries(
+  details: unknown[] | Record<string, unknown> | undefined,
+): Record<string, unknown>[] {
+  if (Array.isArray(details)) {
+    return details.filter((entry): entry is Record<string, unknown> =>
+      Boolean(entry && typeof entry === "object" && !Array.isArray(entry)),
+    ) as Record<string, unknown>[];
+  }
+
+  if (details && typeof details === "object" && !Array.isArray(details)) {
+    return [details as Record<string, unknown>];
+  }
+
+  return [];
+}
+
 function uniqueSheetName(workbook: ExcelJS.Workbook, rawName: string): string {
   const base = rawName.replace(/[\\/?*[\]]/g, "-").slice(0, 31);
   if (!workbook.getWorksheet(base)) return base;
