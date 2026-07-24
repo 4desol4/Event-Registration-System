@@ -1,0 +1,190 @@
+// Ministry Event Registration System — Database Schema
+// See /docs for the full data-model rationale discussed during planning.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  STAFF
+}
+
+enum EventStatus {
+  draft
+  live
+  closed
+}
+
+enum FormStatus {
+  draft
+  published
+  closed
+}
+
+enum FieldType {
+  text
+  paragraph
+  phone
+  email
+  number
+  select
+  radio
+  checkbox
+  yes_no
+  image
+  section_header
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(STAFF)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  auditLogs    AuditLog[]
+  resolvedSubmissions Submission[] @relation("ResolvedBy")
+
+  @@index([email])
+}
+
+model Event {
+  id        String      @id @default(cuid())
+  name      String
+  date      DateTime
+  status    EventStatus @default(draft)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  forms     Form[]
+
+  @@index([status])
+  @@index([date])
+}
+
+model Form {
+  id            String     @id @default(cuid())
+  eventId       String?
+  event         Event?     @relation(fields: [eventId], references: [id], onDelete: SetNull)
+
+  title         String
+  description   String?
+  bannerImageUrl String?
+
+  isTemplate    Boolean    @default(false)
+  templateName  String?
+
+  clonedFromId  String?
+  clonedFrom    Form?      @relation("FormClones", fields: [clonedFromId], references: [id], onDelete: SetNull)
+  clones        Form[]     @relation("FormClones")
+
+  status        FormStatus @default(draft)
+  shortSlug     String?    @unique
+
+  // Wi-Fi hotspot details for attendees without mobile data. Set from the
+  // Form Builder page by an admin — stored here (not in code/env vars) so
+  // updating the network name/password is just a database write through the
+  // app, never a code change or redeploy.
+  wifiEnabled   Boolean    @default(false)
+  wifiSsid      String?
+  wifiPassword  String?
+
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  fields        FormField[]
+  submissions   Submission[]
+
+  @@index([eventId])
+  @@index([shortSlug])
+  @@index([isTemplate])
+}
+
+model FormField {
+  id         String    @id @default(cuid())
+  formId     String
+  form       Form      @relation(fields: [formId], references: [id], onDelete: Cascade)
+
+  label      String
+  type       FieldType
+  required   Boolean   @default(false)
+  order      Int       @default(0)
+
+  // For select/radio: e.g. ["Male", "Female"]
+  options    Json?
+
+  // e.g. { "pattern": "^[0-9]{11}$", "errorMessage": "Enter a valid 11-digit phone number" }
+  validation Json?
+
+  description String?
+
+  // Used only for section_header/image field types
+  imageUrl   String?
+
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([formId])
+  @@index([formId, order])
+}
+
+model Submission {
+  id                String   @id @default(cuid())
+  formId            String
+  form              Form     @relation(fields: [formId], references: [id], onDelete: Cascade)
+
+  // Idempotency key generated client-side — prevents double-tap/network-retry duplicates.
+  // This is NOT a business uniqueness rule; multiple real attendees may share phone/name.
+  submissionToken   String   @unique
+
+  // Dynamic answer payload: { "<fieldId>": "value", ... }
+  data              Json
+
+  flagged           Boolean  @default(false)
+  flagReason        String?
+
+  possibleDuplicate Boolean  @default(false)
+
+  resolvedAt        DateTime?
+  resolvedById      String?
+  resolvedBy        User?    @relation("ResolvedBy", fields: [resolvedById], references: [id], onDelete: SetNull)
+
+  // Simple "in progress" lock so two staff don't work the same flagged row
+  lockedById        String?
+  lockedAt          DateTime?
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([formId])
+  @@index([flagged])
+  @@index([possibleDuplicate])
+  @@index([createdAt])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  action     String   // e.g. "form.publish", "submission.edit", "user.create"
+  targetType String   // e.g. "Form", "Submission", "User"
+  targetId   String
+  details    Json?
+
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([targetType, targetId])
+  @@index([createdAt])
+}
