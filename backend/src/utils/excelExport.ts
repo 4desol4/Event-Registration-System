@@ -99,14 +99,16 @@ export function addFormSheets(
 
   // Breakdown for every select/radio field — this is what makes the "create a
   // summary" step disappear as manual work; it's computed here, not by hand later.
-  const breakdownFields = sortedFields.filter(
-    (f) =>
-      (f.type === "select" ||
-        f.type === "radio" ||
-        f.type === "checkbox" ||
-        f.type === "yes_no") &&
-      (!summaryFieldIds || summaryFieldIds.includes(f.id)),
-  );
+  const breakdownFields = sortedFields.filter((f) => {
+    const fieldType = String(f.type);
+    return (
+      (fieldType === "select" ||
+        fieldType === "radio" ||
+        fieldType === "checkbox" ||
+        fieldType === "yes_no") &&
+      (!summaryFieldIds || summaryFieldIds.includes(f.id))
+    );
+  });
   for (const field of breakdownFields) {
     summarySheet.addRow({ metric: field.label.toUpperCase(), value: "" }).font =
       { bold: true };
@@ -114,7 +116,7 @@ export function addFormSheets(
     for (const submission of submissions) {
       const data = submission.data as Record<string, unknown>;
       const rawValue = data[field.id];
-      if (field.type === "yes_no") {
+      if (String(field.type) === "yes_no") {
         const value =
           rawValue && typeof rawValue === "object" && "enabled" in rawValue;
         if (!value) continue;
@@ -161,7 +163,7 @@ function uniqueSheetName(workbook: ExcelJS.Workbook, rawName: string): string {
 }
 
 function formatFieldCellValue(field: FormField, value: unknown): string {
-  if (field.type === "yes_no") {
+  if (String(field.type) === "yes_no") {
     const payload = value as
       | { enabled?: boolean; details?: unknown[] | Record<string, unknown> }
       | undefined;
@@ -181,7 +183,9 @@ function formatFieldCellValue(field: FormField, value: unknown): string {
       : ["Name", "Class"];
     const renderedEntries = entries.map((entry, index) => {
       const record =
-        entry && typeof entry === "object" ? (entry as Record<string, unknown>) : {};
+        entry && typeof entry === "object"
+          ? (entry as Record<string, unknown>)
+          : {};
       const parts = orderedLabels
         .map((label: string) => {
           const text = formatCellValue(record[label]);
