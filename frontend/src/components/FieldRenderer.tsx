@@ -9,6 +9,8 @@ import {
   CircleHelp,
   Image as ImageIcon,
   AlignLeft,
+  Plus,
+  Trash2,
   LucideIcon,
 } from "lucide-react";
 import { FormField } from "../lib/types";
@@ -46,26 +48,40 @@ function normalizeYesNoValue(value: unknown) {
     "enabled" in value
   ) {
     const record = value as Record<string, unknown>;
-    const details =
-      record.details &&
-      typeof record.details === "object" &&
-      !Array.isArray(record.details)
-        ? Object.entries(record.details as Record<string, unknown>).reduce(
-            (acc, [key, detailVal]) => {
-              acc[key] = String(detailVal ?? "");
-              return acc;
-            },
-            {} as Record<string, string>,
-          )
-        : {};
+    const detailEntries = Array.isArray(record.details)
+      ? record.details.map((entry) => {
+          if (entry && typeof entry === "object" && !Array.isArray(entry)) {
+            return Object.entries(entry as Record<string, unknown>).reduce(
+              (acc, [key, detailVal]) => {
+                acc[key] = String(detailVal ?? "");
+                return acc;
+              },
+              {} as Record<string, string>,
+            );
+          }
+          return {} as Record<string, string>;
+        })
+      : record.details &&
+          typeof record.details === "object" &&
+          !Array.isArray(record.details)
+        ? [
+            Object.entries(record.details as Record<string, unknown>).reduce(
+              (acc, [key, detailVal]) => {
+                acc[key] = String(detailVal ?? "");
+                return acc;
+              },
+              {} as Record<string, string>,
+            ),
+          ]
+        : [];
 
     return {
       enabled: Boolean(record.enabled),
-      details,
+      entries: detailEntries.length ? detailEntries : [{}],
     };
   }
 
-  return { enabled: false, details: {} as Record<string, string> };
+  return { enabled: false, entries: [{}] as Record<string, string>[] };
 }
 
 export function FieldRenderer({ field, value, error, onChange }: Props) {
@@ -130,10 +146,24 @@ export function FieldRenderer({ field, value, error, onChange }: Props) {
 
     return (
       <div className="flex flex-col gap-3">
+        <label className="flex items-center gap-1.5 text-sm font-medium text-brand-dark-700 dark:text-brand-lime-200">
+          <Icon
+            size={15}
+            className="text-brand-lime-600 dark:text-brand-lime-400"
+          />
+          {field.label}
+          {field.required && <span className="text-red-500">*</span>}
+        </label>
+
         <div className="flex flex-wrap gap-2">
           <button
             type="button"
-            onClick={() => onChange({ enabled: true, details: state.details })}
+            onClick={() =>
+              onChange({
+                enabled: true,
+                details: state.entries.length ? state.entries : [{}],
+              })
+            }
             className={`rounded-full border px-4 py-2 text-sm font-medium transition-all duration-200 active:scale-95 ${
               state.enabled
                 ? "border-brand-lime-500 bg-brand-lime-500/15 text-brand-lime-700 dark:text-brand-lime-300"
@@ -144,7 +174,12 @@ export function FieldRenderer({ field, value, error, onChange }: Props) {
           </button>
           <button
             type="button"
-            onClick={() => onChange({ enabled: false, details: state.details })}
+            onClick={() =>
+              onChange({
+                enabled: false,
+                details: state.entries,
+              })
+            }
             className={`rounded-full border px-4 py-2 text-sm font-medium transition-all duration-200 active:scale-95 ${
               !state.enabled
                 ? "border-brand-lime-500 bg-brand-lime-500/15 text-brand-lime-700 dark:text-brand-lime-300"
@@ -156,29 +191,78 @@ export function FieldRenderer({ field, value, error, onChange }: Props) {
         </div>
 
         {state.enabled && (
-          <div className="space-y-2 rounded-2xl border border-brand-dark-100 bg-brand-dark-50/60 p-3 dark:border-brand-dark-700 dark:bg-brand-dark-950/50">
-            {detailLabels.map((label) => (
-              <div key={label} className="flex flex-col gap-1">
-                <label className="text-xs font-semibold uppercase tracking-wide text-brand-dark-500 dark:text-brand-dark-300">
-                  {label}
-                </label>
-                <input
-                  type="text"
-                  value={state.details[label] ?? ""}
-                  onChange={(e) =>
-                    onChange({
-                      enabled: true,
-                      details: {
-                        ...state.details,
-                        [label]: e.target.value,
-                      },
-                    })
-                  }
-                  className={`${inputBaseClasses} ${borderClasses}`}
-                  placeholder={`Enter ${label.toLowerCase()}`}
-                />
+          <div className="space-y-3 rounded-2xl border border-brand-dark-100 bg-brand-dark-50/60 p-3 dark:border-brand-dark-700 dark:bg-brand-dark-950/50">
+            {state.entries.map((entry, index) => (
+              <div
+                key={`entry-${index}`}
+                className="rounded-2xl border border-brand-dark-100 bg-white/80 p-3 dark:border-brand-dark-700 dark:bg-brand-dark-900/70"
+              >
+                <div className="mb-2 flex items-center justify-between gap-2">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-brand-dark-500 dark:text-brand-dark-300">
+                    Student {index + 1}
+                  </p>
+                  {state.entries.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const nextEntries = state.entries.filter(
+                          (_, i) => i !== index,
+                        );
+                        onChange({ enabled: true, details: nextEntries });
+                      }}
+                      className="inline-flex items-center gap-1 text-xs font-medium text-red-500 hover:opacity-80"
+                    >
+                      <Trash2 size={13} />
+                      Remove
+                    </button>
+                  )}
+                </div>
+
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {detailLabels.map((label) => (
+                    <div
+                      key={`${label}-${index}`}
+                      className="flex flex-col gap-1"
+                    >
+                      <label className="text-xs font-semibold uppercase tracking-wide text-brand-dark-500 dark:text-brand-dark-300">
+                        {label}
+                      </label>
+                      <input
+                        type="text"
+                        value={entry[label] ?? ""}
+                        onChange={(e) => {
+                          const nextEntries = state.entries.map((item, i) =>
+                            i === index
+                              ? { ...item, [label]: e.target.value }
+                              : item,
+                          );
+
+                          onChange({ enabled: true, details: nextEntries });
+                        }}
+                        className={`${inputBaseClasses} ${borderClasses}`}
+                        placeholder={`Enter ${label.toLowerCase()}`}
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
             ))}
+
+            <button
+              type="button"
+              onClick={() => {
+                const nextEntries = [
+                  ...state.entries,
+                  {} as Record<string, string>,
+                ];
+                onChange({ enabled: true, details: nextEntries });
+              }}
+              className="inline-flex items-center gap-1.5 text-sm font-medium transition-colors hover:opacity-80"
+              style={{ color: "var(--brand-lime-600, #96c100)" }}
+            >
+              <Plus size={14} />
+              Add another student
+            </button>
           </div>
         )}
 
