@@ -67,6 +67,36 @@ export function buildSubmissionsRouter(io: SocketIOServer) {
           value === "" ||
           (Array.isArray(value) && value.length === 0);
 
+        if (field.type === "yes_no" && field.required) {
+          const isAnswered =
+            value &&
+            typeof value === "object" &&
+            !Array.isArray(value) &&
+            "enabled" in value;
+          const yesNoValue = value as Record<string, unknown> | undefined;
+          const hasDetails =
+            !yesNoValue?.enabled ||
+            (Array.isArray(yesNoValue.details)
+              ? yesNoValue.details.some(
+                  (entry) =>
+                    entry &&
+                    typeof entry === "object" &&
+                    !Array.isArray(entry) &&
+                    Object.values(entry as Record<string, unknown>).some(
+                      (detail) => String(detail ?? "").trim().length > 0,
+                    ),
+                )
+              : false);
+
+          if (!isAnswered || (yesNoValue?.enabled && !hasDetails)) {
+            flagged = true;
+            flagReasons.push(
+              `"${field.label}" requires a response and at least one detail when set to Yes`,
+            );
+            continue;
+          }
+        }
+
         if (field.required && isEmpty && field.type !== "section_header") {
           flagged = true;
           flagReasons.push(`"${field.label}" is required but was left blank`);

@@ -96,6 +96,7 @@ export function FormBuilderPage() {
   const [saving, setSaving] = useState(false);
   const dragFrom = useRef<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const descriptionSaveTimeoutRef = useRef<number | null>(null);
 
   function cloneForm(form: EventForm) {
     return JSON.parse(JSON.stringify(form)) as EventForm;
@@ -131,6 +132,24 @@ export function FormBuilderPage() {
   }
 
   useEffect(load, [formId]);
+
+  useEffect(() => {
+    if (!form || readOnly || description === (form.description ?? "")) return;
+
+    if (descriptionSaveTimeoutRef.current) {
+      window.clearTimeout(descriptionSaveTimeoutRef.current);
+    }
+
+    descriptionSaveTimeoutRef.current = window.setTimeout(() => {
+      void updateFormMeta();
+    }, 300);
+
+    return () => {
+      if (descriptionSaveTimeoutRef.current) {
+        window.clearTimeout(descriptionSaveTimeoutRef.current);
+      }
+    };
+  }, [description, form?.id, readOnly, form?.description]);
 
   if (!form) {
     return (
@@ -564,7 +583,7 @@ export function FormBuilderPage() {
 
   return (
     <div
-      className="min-h-screen w-full transition-colors duration-300 flex flex-col"
+      className="min-h-screen w-full overflow-x-hidden transition-colors duration-300 flex flex-col"
       style={{ backgroundColor: t.bg, fontFamily: "Manrope, sans-serif" }}
     >
       <style>{`
@@ -588,7 +607,7 @@ export function FormBuilderPage() {
 
       {/* Top bar */}
       <div
-        className="sticky top-0 z-30 flex items-center gap-3 px-4 py-3 backdrop-blur-md sm:px-6"
+        className="sticky top-0 z-30 flex flex-wrap items-center gap-2 px-3 py-3 backdrop-blur-md sm:flex-nowrap sm:gap-3 sm:px-6"
         style={{
           background: dark ? "rgba(10,19,16,0.88)" : "rgba(247,248,243,0.92)",
           borderBottom: `1px solid ${t.border}`,
@@ -609,11 +628,11 @@ export function FormBuilderPage() {
           }
           onBlur={() => updateFormMeta()}
           disabled={readOnly}
-          className="min-w-0 flex-1 truncate border-0 bg-transparent text-sm font-semibold outline-none placeholder:text-brand-dark-400 dark:placeholder:text-brand-dark-500 sm:flex-none sm:w-56"
+          className="min-w-0 flex-1 basis-full truncate border-0 bg-transparent text-sm font-semibold outline-none placeholder:text-brand-dark-400 dark:placeholder:text-brand-dark-500 sm:basis-auto sm:flex-none sm:w-56"
           style={{ color: t.text, opacity: readOnly ? 0.75 : 1 }}
         />
 
-        <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
+        <div className="ml-auto flex flex-wrap items-center justify-end gap-1.5 sm:gap-2">
           <button
             onClick={() => toggleTheme()}
             className="flex h-9 w-9 items-center justify-center rounded-full transition-transform hover:scale-105"
@@ -650,7 +669,7 @@ export function FormBuilderPage() {
                   : handlePublish()
               }
               disabled={publishing || (form?.fields?.length ?? 0) === 0}
-              className="flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold text-white shadow-sm transition-transform active:scale-95"
+              className="flex w-full items-center justify-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold text-white shadow-sm transition-transform active:scale-95 sm:w-auto"
               style={{
                 background:
                   form.status === "published"
@@ -704,7 +723,7 @@ export function FormBuilderPage() {
         </div>
       )}
 
-      <div className="mx-auto mt-4 flex max-w-2xl items-center justify-between gap-3 px-4 sm:px-6">
+      <div className="mx-auto mt-4 flex max-w-2xl flex-col gap-3 px-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <div
           className="rounded-2xl px-4 py-3 text-sm"
           style={{

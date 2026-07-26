@@ -131,7 +131,7 @@ export function SubmissionsDashboardPage() {
 
   return (
     <div className="animate-fade-in">
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-brand-dark-900 dark:text-brand-lime-50">
             {form.title}
@@ -140,7 +140,7 @@ export function SubmissionsDashboardPage() {
             Live registration dashboard
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
           {canManage && (
             <button
               onClick={() => {
@@ -164,8 +164,8 @@ export function SubmissionsDashboardPage() {
         </div>
       </div>
 
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex gap-1.5">
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-wrap gap-1.5">
           <TabButton
             active={tab === "all"}
             onClick={() => setTab("all")}
@@ -199,7 +199,7 @@ export function SubmissionsDashboardPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search submissions..."
-            className="rounded-xl border border-brand-dark-100 dark:border-brand-dark-700 bg-white dark:bg-brand-dark-800 py-2 pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-brand-lime-500/60"
+            className="w-full rounded-xl border border-brand-dark-100 bg-white py-2 pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-brand-lime-500/60 dark:border-brand-dark-700 dark:bg-brand-dark-800 sm:w-64"
           />
         </div>
       </div>

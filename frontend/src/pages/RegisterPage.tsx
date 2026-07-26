@@ -14,6 +14,36 @@ import { StatusScreen } from "../components/StatusScreen";
 import { SuccessScreen } from "../components/SuccessScreen";
 import { ThemeToggle } from "../components/ThemeToggle";
 
+function normalizeYesNoValue(value: unknown) {
+  if (
+    value &&
+    typeof value === "object" &&
+    !Array.isArray(value) &&
+    "enabled" in value
+  ) {
+    const record = value as Record<string, unknown>;
+    return {
+      enabled: Boolean(record.enabled),
+      entries: Array.isArray(record.details)
+        ? (record.details as Array<Record<string, unknown>>)
+        : [],
+    };
+  }
+
+  return { enabled: false, entries: [] as Array<Record<string, unknown>> };
+}
+
+function hasMeaningfulYesNoDetails(value: unknown) {
+  const { enabled, entries } = normalizeYesNoValue(value);
+  if (!enabled) return true;
+
+  return entries.some((entry) =>
+    Object.values(entry ?? {}).some(
+      (detail) => String(detail ?? "").trim().length > 0,
+    ),
+  );
+}
+
 type PageState =
   | "loading"
   | "ready"
@@ -75,16 +105,30 @@ export function RegisterPage() {
     for (const field of form.fields) {
       if (field.type === "section_header") continue;
       const value = values[field.id];
-      const isYesNoAnswered =
-        field.type === "yes_no" &&
-        typeof value === "object" &&
-        value !== null &&
-        "enabled" in value;
       const isEmpty =
         value === undefined ||
         value === null ||
         value === "" ||
-        (field.type === "yes_no" && !isYesNoAnswered);
+        (Array.isArray(value) && value.length === 0);
+
+      if (field.type === "yes_no") {
+        const isAnswered =
+          typeof value === "object" && value !== null && "enabled" in value;
+
+        if (field.required && !isAnswered) {
+          errors[field.id] = `${field.label} is required`;
+          continue;
+        }
+
+        if (field.required && isAnswered && !hasMeaningfulYesNoDetails(value)) {
+          errors[field.id] = `${field.label} requires at least one detail`;
+          continue;
+        }
+
+        if (!field.required && !isAnswered) {
+          continue;
+        }
+      }
 
       if (field.required && isEmpty) {
         errors[field.id] = `${field.label} is required`;
