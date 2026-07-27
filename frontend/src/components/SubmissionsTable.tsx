@@ -1,4 +1,12 @@
-import { AlertTriangle, Copy, Lock, CheckCircle2, Pencil } from "lucide-react";
+import { useState } from "react";
+import {
+  AlertTriangle,
+  Copy,
+  Lock,
+  CheckCircle2,
+  Pencil,
+  ChevronDown,
+} from "lucide-react";
 import { FormField } from "../lib/types";
 import { Submission } from "../lib/api";
 
@@ -21,6 +29,7 @@ export function SubmissionsTable({
   currentStaffName,
   canManage,
 }: Props) {
+  const [expandedId, setExpandedId] = useState<string | null>(null);
   const sortedFields = [...fields]
     .filter((f) => f.type !== "section_header")
     .sort((a, b) => a.order - b.order);
@@ -44,7 +53,7 @@ export function SubmissionsTable({
           return (
             <div
               key={s.id}
-              className={`rounded-2xl border p-3 transition-colors ${
+              className={`rounded-2xl border transition-colors ${
                 s.flagged
                   ? "border-red-200 bg-red-50 dark:border-red-900/50 dark:bg-red-950/30"
                   : s.possibleDuplicate
@@ -52,8 +61,14 @@ export function SubmissionsTable({
                     : "border-brand-dark-100 dark:border-brand-dark-800"
               }`}
             >
-              <div className="flex items-start gap-2">
-                <div className="mt-0.5">
+              <button
+                type="button"
+                onClick={() =>
+                  setExpandedId((current) => (current === s.id ? null : s.id))
+                }
+                className="flex w-full items-start gap-2 p-3 text-left"
+              >
+                <div className="mt-0.5 shrink-0">
                   {s.flagged ? (
                     <AlertTriangle size={16} className="text-red-400" />
                   ) : s.possibleDuplicate ? (
@@ -67,11 +82,36 @@ export function SubmissionsTable({
                     <p className="text-sm font-semibold text-brand-dark-800 dark:text-brand-lime-100">
                       Submission {i + 1}
                     </p>
-                    <span className="text-[11px] text-brand-dark-500 dark:text-brand-dark-300">
-                      {new Date(s.createdAt).toLocaleTimeString()}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[11px] text-brand-dark-500 dark:text-brand-dark-300">
+                        {new Date(s.createdAt).toLocaleTimeString()}
+                      </span>
+                      <ChevronDown
+                        size={14}
+                        className={`shrink-0 transition-transform ${
+                          expandedId === s.id ? "rotate-180" : "rotate-0"
+                        }`}
+                      />
+                    </div>
                   </div>
-                  <div className="mt-2 space-y-2">
+                  <div className="mt-2 flex flex-wrap items-center gap-2">
+                    {isLockedByOther && (
+                      <span className="flex items-center gap-1 rounded-full bg-brand-dark-100 px-2 py-1 text-[10px] text-brand-dark-700 dark:bg-brand-dark-800 dark:text-brand-dark-300">
+                        <Lock size={10} />
+                        {s.lockedById}
+                      </span>
+                    )}
+                    {(s.flagged || s.possibleDuplicate) && canManage && (
+                      <span className="rounded-full bg-brand-lime-500/10 px-2.5 py-1 text-[10px] font-semibold text-brand-lime-700 dark:text-brand-lime-200">
+                        Needs review
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </button>
+              {expandedId === s.id && (
+                <div className="border-t border-brand-dark-100 px-3 pb-3 pt-2 dark:border-brand-dark-800">
+                  <div className="space-y-2">
                     {sortedFields.map((f) => (
                       <div
                         key={f.id}
@@ -87,12 +127,6 @@ export function SubmissionsTable({
                     ))}
                   </div>
                   <div className="mt-3 flex flex-wrap items-center gap-2">
-                    {isLockedByOther && (
-                      <span className="flex items-center gap-1 rounded-full bg-brand-dark-100 px-2 py-1 text-[10px] text-brand-dark-700 dark:bg-brand-dark-800 dark:text-brand-dark-300">
-                        <Lock size={10} />
-                        {s.lockedById}
-                      </span>
-                    )}
                     {canManage && (
                       <button
                         onClick={() => {
@@ -115,7 +149,7 @@ export function SubmissionsTable({
                     )}
                   </div>
                 </div>
-              </div>
+              )}
             </div>
           );
         })}
