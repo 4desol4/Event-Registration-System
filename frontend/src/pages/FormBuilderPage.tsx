@@ -607,32 +607,34 @@ export function FormBuilderPage() {
 
       {/* Top bar */}
       <div
-        className="sticky top-0 z-30 flex flex-wrap items-center gap-2 px-3 py-3 backdrop-blur-md sm:flex-nowrap sm:gap-3 sm:px-6"
+        className="sticky top-0 z-30 flex flex-col gap-2 border-b px-3 py-3 backdrop-blur-md sm:flex-row sm:items-center sm:gap-3 sm:px-6"
         style={{
           background: dark ? "rgba(10,19,16,0.88)" : "rgba(247,248,243,0.92)",
-          borderBottom: `1px solid ${t.border}`,
+          borderBottomColor: t.border,
         }}
       >
-        <div
-          className="flex h-9 w-9 items-center justify-center rounded-lg"
-          style={{ background: t.accent }}
-        >
-          <GraduationCap size={18} className="text-white" />
+        <div className="flex items-center gap-2">
+          <div
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
+            style={{ background: t.accent }}
+          >
+            <GraduationCap size={18} className="text-white" />
+          </div>
+          <input
+            value={form.title}
+            onChange={(e) =>
+              setForm((prev) =>
+                prev ? normalizeForm({ ...prev, title: e.target.value }) : prev,
+              )
+            }
+            onBlur={() => updateFormMeta()}
+            disabled={readOnly}
+            className="min-w-0 flex-1 truncate border-0 bg-transparent text-sm font-semibold outline-none placeholder:text-brand-dark-400 dark:placeholder:text-brand-dark-500 sm:w-56"
+            style={{ color: t.text, opacity: readOnly ? 0.75 : 1 }}
+          />
         </div>
-        <input
-          value={form.title}
-          onChange={(e) =>
-            setForm((prev) =>
-              prev ? normalizeForm({ ...prev, title: e.target.value }) : prev,
-            )
-          }
-          onBlur={() => updateFormMeta()}
-          disabled={readOnly}
-          className="min-w-0 flex-1 basis-full truncate border-0 bg-transparent text-sm font-semibold outline-none placeholder:text-brand-dark-400 dark:placeholder:text-brand-dark-500 sm:basis-auto sm:flex-none sm:w-56"
-          style={{ color: t.text, opacity: readOnly ? 0.75 : 1 }}
-        />
 
-        <div className="ml-auto flex flex-wrap items-center justify-end gap-1.5 sm:gap-2">
+        <div className="flex flex-wrap items-center justify-start gap-1.5 sm:ml-auto sm:justify-end sm:gap-2">
           <button
             onClick={() => toggleTheme()}
             className="flex h-9 w-9 items-center justify-center rounded-full transition-transform hover:scale-105"
@@ -669,7 +671,7 @@ export function FormBuilderPage() {
                   : handlePublish()
               }
               disabled={publishing || (form?.fields?.length ?? 0) === 0}
-              className="flex w-full items-center justify-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold text-white shadow-sm transition-transform active:scale-95 sm:w-auto"
+              className="flex w-full items-center justify-center gap-1.5 rounded-full px-3 py-2 text-sm font-semibold text-white shadow-sm transition-transform active:scale-95 sm:w-auto"
               style={{
                 background:
                   form.status === "published"
@@ -723,9 +725,9 @@ export function FormBuilderPage() {
         </div>
       )}
 
-      <div className="mx-auto mt-4 flex max-w-2xl flex-col gap-3 px-3 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+      <div className="mx-auto mt-4 flex max-w-2xl flex-col gap-2 px-3 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <div
-          className="rounded-2xl px-4 py-3 text-sm"
+          className="w-full rounded-2xl px-3 py-2.5 text-sm sm:w-auto sm:px-4 sm:py-3"
           style={{
             backgroundColor: t.surfaceAlt,
             border: `1px solid ${t.border}`,

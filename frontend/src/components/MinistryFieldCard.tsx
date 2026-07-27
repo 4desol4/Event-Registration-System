@@ -102,7 +102,7 @@ export function MinistryFieldCard({
       <button
         type="button"
         onClick={() => onExpand(expanded ? null : field.id)}
-        className="flex w-full items-center gap-3 rounded-2xl px-4 py-3.5 text-left"
+        className="flex w-full items-center gap-2 rounded-2xl px-3 py-3 text-left sm:gap-3 sm:px-4 sm:py-3.5"
       >
         <span
           className="cursor-grab opacity-40 hover:opacity-70"
@@ -113,8 +113,8 @@ export function MinistryFieldCard({
         <div
           className="flex shrink-0 items-center justify-center rounded-lg"
           style={{
-            width: 32,
-            height: 32,
+            width: 30,
+            height: 30,
             background: t.accentSoft,
             color: t.accent,
           }}
@@ -123,14 +123,14 @@ export function MinistryFieldCard({
         </div>
         <div className="min-w-0 flex-1">
           <p
-            className="truncate text-sm font-semibold sm:text-base"
+            className="truncate text-[13px] font-semibold sm:text-base"
             style={{ color: t.text, fontFamily: "Manrope, sans-serif" }}
           >
             {field.label || "Untitled question"}
             {field.required && <span style={{ color: t.gold }}> *</span>}
           </p>
           <p
-            className="truncate text-[11px] sm:text-xs"
+            className="truncate text-[10px] sm:text-xs"
             style={{ color: t.textFaint }}
           >
             {config.label}
@@ -140,7 +140,7 @@ export function MinistryFieldCard({
           </p>
         </div>
         <ChevronDown
-          size={18}
+          size={16}
           style={{
             color: t.textMuted,
             transform: expanded ? "rotate(180deg)" : "rotate(0deg)",
