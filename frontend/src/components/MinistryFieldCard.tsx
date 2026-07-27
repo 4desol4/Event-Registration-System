@@ -19,6 +19,7 @@ interface Props {
   index: number;
   total: number;
   locked: boolean;
+  live: boolean;
   expanded: boolean;
   t: MinistryTheme;
   onExpand: (fieldId: string | null) => void;
@@ -39,6 +40,7 @@ export function MinistryFieldCard({
   index,
   total,
   locked,
+  live,
   expanded,
   t,
   onExpand,
@@ -111,8 +113,8 @@ export function MinistryFieldCard({
         <div
           className="flex shrink-0 items-center justify-center rounded-lg"
           style={{
-            width: 34,
-            height: 34,
+            width: 32,
+            height: 32,
             background: t.accentSoft,
             color: t.accent,
           }}
@@ -121,13 +123,16 @@ export function MinistryFieldCard({
         </div>
         <div className="min-w-0 flex-1">
           <p
-            className="truncate font-semibold"
+            className="truncate text-sm font-semibold sm:text-base"
             style={{ color: t.text, fontFamily: "Manrope, sans-serif" }}
           >
             {field.label || "Untitled question"}
             {field.required && <span style={{ color: t.gold }}> *</span>}
           </p>
-          <p className="truncate text-xs" style={{ color: t.textFaint }}>
+          <p
+            className="truncate text-[11px] sm:text-xs"
+            style={{ color: t.textFaint }}
+          >
             {config.label}
             {hasOptions && field.options?.length
               ? ` · ${field.options.length} options`
@@ -147,7 +152,7 @@ export function MinistryFieldCard({
       {/* Expanded editor */}
       {expanded && (
         <div
-          className="px-5 pb-5 pt-1"
+          className="px-3 pb-4 pt-1 sm:px-5 sm:pb-5"
           style={{ animation: "expandIn 0.22s ease both" }}
         >
           <div className="h-px w-full" style={{ background: t.border }} />
@@ -171,7 +176,7 @@ export function MinistryFieldCard({
                 }
               }}
               placeholder={isSection ? "Section title" : "Question label"}
-              className="flex-1 border-0 border-b-2 bg-transparent pb-2 text-lg font-medium outline-none transition-colors"
+              className="flex-1 border-0 border-b-2 bg-transparent pb-2 text-base font-medium outline-none transition-colors sm:text-lg"
               style={{
                 borderColor: t.borderStrong,
                 color: t.text,
@@ -230,13 +235,14 @@ export function MinistryFieldCard({
             />
           )}
 
-          {locked && !isSection && (
+          {live && !isSection && (
             <p
-              className="mt-2 flex items-center gap-1.5 text-xs"
+              className="mt-2 flex items-start gap-1.5 text-xs"
               style={{ color: t.gold }}
             >
-              <AlertTriangle size={13} /> Question type is locked because this
-              form already has submissions.
+              <AlertTriangle size={13} className="mt-0.5 shrink-0" /> This form
+              is live — you can keep refining content, but changes that affect
+              existing responses stay limited.
             </p>
           )}
 

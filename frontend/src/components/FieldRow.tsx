@@ -1,5 +1,12 @@
 import { useState } from "react";
-import { ChevronUp, ChevronDown, Trash2, GripVertical, Plus, X } from "lucide-react";
+import {
+  ChevronUp,
+  ChevronDown,
+  Trash2,
+  GripVertical,
+  Plus,
+  X,
+} from "lucide-react";
 import { FormField } from "../lib/types";
 import { FIELD_TYPE_CONFIG, FIELD_TYPE_ORDER } from "../lib/fieldConfig";
 
@@ -13,7 +20,15 @@ interface Props {
   onMove: (direction: "up" | "down") => void;
 }
 
-export function FieldRow({ field, locked, isFirst, isLast, onUpdate, onDelete, onMove }: Props) {
+export function FieldRow({
+  field,
+  locked,
+  isFirst,
+  isLast,
+  onUpdate,
+  onDelete,
+  onMove,
+}: Props) {
   const [expanded, setExpanded] = useState(false);
   const config = FIELD_TYPE_CONFIG[field.type];
   const Icon = config.icon;
@@ -21,13 +36,22 @@ export function FieldRow({ field, locked, isFirst, isLast, onUpdate, onDelete, o
   return (
     <div className="rounded-xl border border-brand-dark-100 dark:border-brand-dark-700 bg-white dark:bg-brand-dark-900 transition-all duration-200">
       <div className="flex items-center gap-2 p-3">
-        <GripVertical size={15} className="flex-shrink-0 text-brand-dark-300 dark:text-brand-dark-600" />
+        <GripVertical
+          size={15}
+          className="flex-shrink-0 text-brand-dark-300 dark:text-brand-dark-600"
+        />
 
         <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-brand-lime-500/10">
-          <Icon size={15} className="text-brand-lime-600 dark:text-brand-lime-400" />
+          <Icon
+            size={15}
+            className="text-brand-lime-600 dark:text-brand-lime-400"
+          />
         </div>
 
-        <button onClick={() => setExpanded((e) => !e)} className="flex-1 text-left">
+        <button
+          onClick={() => setExpanded((e) => !e)}
+          className="flex-1 text-left"
+        >
           <p className="text-sm font-medium text-brand-dark-900 dark:text-brand-lime-50">
             {field.label || "Untitled field"}
           </p>
@@ -55,7 +79,11 @@ export function FieldRow({ field, locked, isFirst, isLast, onUpdate, onDelete, o
           <button
             onClick={onDelete}
             disabled={locked}
-            title={locked ? "Can't delete — this form already has submissions" : "Delete field"}
+            title={
+              locked
+                ? "Can't delete — this form already has submissions"
+                : "Delete field"
+            }
             className="rounded-lg p-1.5 text-red-400 transition-colors hover:bg-red-50 dark:hover:bg-red-950/30 disabled:opacity-30"
           >
             <Trash2 size={15} />
@@ -85,7 +113,9 @@ export function FieldRow({ field, locked, isFirst, isLast, onUpdate, onDelete, o
                 <select
                   value={field.type}
                   disabled={locked}
-                  onChange={(e) => onUpdate({ type: e.target.value as FormField["type"] })}
+                  onChange={(e) =>
+                    onUpdate({ type: e.target.value as FormField["type"] })
+                  }
                   className="w-full rounded-lg border border-brand-dark-100 dark:border-brand-dark-700 bg-white dark:bg-brand-dark-800 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-brand-lime-500/60 disabled:opacity-50"
                 >
                   {FIELD_TYPE_ORDER.map((t) => (
@@ -117,7 +147,10 @@ export function FieldRow({ field, locked, isFirst, isLast, onUpdate, onDelete, o
             />
           )}
 
-          {(field.type === "phone" || field.type === "email" || field.type === "text" || field.type === "number") && (
+          {(field.type === "phone" ||
+            field.type === "email" ||
+            field.type === "text" ||
+            field.type === "number") && (
             <div>
               <label className="mb-1 block text-xs font-medium text-brand-dark-500 dark:text-brand-dark-300">
                 Validation pattern (optional, regex)
@@ -125,7 +158,12 @@ export function FieldRow({ field, locked, isFirst, isLast, onUpdate, onDelete, o
               <input
                 value={field.validation?.pattern ?? ""}
                 onChange={(e) =>
-                  onUpdate({ validation: { ...field.validation, pattern: e.target.value } })
+                  onUpdate({
+                    validation: {
+                      ...field.validation,
+                      pattern: e.target.value,
+                    },
+                  })
                 }
                 placeholder="e.g. ^[0-9]{11}$"
                 className="w-full rounded-lg border border-brand-dark-100 dark:border-brand-dark-700 bg-white dark:bg-brand-dark-800 px-3 py-2 text-sm font-mono outline-none focus:ring-2 focus:ring-brand-lime-500/60"
@@ -133,7 +171,12 @@ export function FieldRow({ field, locked, isFirst, isLast, onUpdate, onDelete, o
               <input
                 value={field.validation?.errorMessage ?? ""}
                 onChange={(e) =>
-                  onUpdate({ validation: { ...field.validation, errorMessage: e.target.value } })
+                  onUpdate({
+                    validation: {
+                      ...field.validation,
+                      errorMessage: e.target.value,
+                    },
+                  })
                 }
                 placeholder="Error message shown to attendee"
                 className="mt-2 w-full rounded-lg border border-brand-dark-100 dark:border-brand-dark-700 bg-white dark:bg-brand-dark-800 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-brand-lime-500/60"
@@ -143,7 +186,8 @@ export function FieldRow({ field, locked, isFirst, isLast, onUpdate, onDelete, o
 
           {locked && (
             <p className="rounded-lg bg-amber-50 dark:bg-amber-950/30 px-2.5 py-1.5 text-xs text-amber-600 dark:text-amber-400">
-              This form already has submissions — type and required-status changes are locked to protect existing data.
+              This form is live — you can keep refining content, but changes
+              that affect existing responses stay limited.
             </p>
           )}
         </div>
@@ -152,7 +196,13 @@ export function FieldRow({ field, locked, isFirst, isLast, onUpdate, onDelete, o
   );
 }
 
-function OptionsEditor({ options, onChange }: { options: string[]; onChange: (opts: string[]) => void }) {
+function OptionsEditor({
+  options,
+  onChange,
+}: {
+  options: string[];
+  onChange: (opts: string[]) => void;
+}) {
   const [draft, setDraft] = useState("");
 
   function addOption() {
@@ -173,7 +223,9 @@ function OptionsEditor({ options, onChange }: { options: string[]; onChange: (op
             className="flex items-center gap-1 rounded-full bg-brand-lime-500/10 px-2.5 py-1 text-xs text-brand-lime-700 dark:text-brand-lime-300"
           >
             {opt}
-            <button onClick={() => onChange(options.filter((_, idx) => idx !== i))}>
+            <button
+              onClick={() => onChange(options.filter((_, idx) => idx !== i))}
+            >
               <X size={11} />
             </button>
           </span>

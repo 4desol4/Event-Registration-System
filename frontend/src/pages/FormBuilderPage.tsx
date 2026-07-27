@@ -13,7 +13,6 @@ import {
   Moon,
   Image as ImageIcon,
   QrCode,
-  Lock,
   AlertTriangle,
   ShieldCheck,
   GraduationCap,
@@ -160,6 +159,7 @@ export function FormBuilderPage() {
   }
 
   const locked = (form?._count?.submissions ?? 0) > 0;
+  const isLive = form.status === "published" || locked;
   const canUndo = historyIndex > 0;
   const canRedo = historyIndex + 1 < history.length;
 
@@ -694,18 +694,18 @@ export function FormBuilderPage() {
         </div>
       </div>
 
-      {locked && (
+      {isLive && (
         <div
-          className="mx-auto mt-4 flex max-w-2xl items-center gap-2 rounded-xl px-4 py-3 text-sm"
+          className="mx-auto mt-4 flex max-w-2xl items-start gap-2 rounded-xl px-3 py-3 text-sm sm:px-4"
           style={{
             background: t.dangerSoft,
             color: t.danger,
             animation: "fadeInUp 0.25s ease both",
           }}
         >
-          <Lock size={15} className="shrink-0" />
-          This form has live submissions — deleting questions or changing their
-          type is disabled to protect existing data.
+          <ShieldCheck size={15} className="mt-0.5 shrink-0" />
+          This form is live and accepting responses. You can keep refining the
+          content, but changes that affect existing submissions stay limited.
         </div>
       )}
 
@@ -723,7 +723,7 @@ export function FormBuilderPage() {
         </div>
       )}
 
-      <div className="mx-auto mt-4 flex max-w-2xl flex-col gap-3 px-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+      <div className="mx-auto mt-4 flex max-w-2xl flex-col gap-3 px-3 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <div
           className="rounded-2xl px-4 py-3 text-sm"
           style={{
@@ -797,7 +797,7 @@ export function FormBuilderPage() {
       </div>
 
       {/* Content */}
-      <div className="mx-auto max-w-2xl px-4 py-6 sm:px-6">
+      <div className="mx-auto max-w-2xl px-3 py-6 sm:px-6">
         <div
           className="mb-4 rounded-2xl border p-4 shadow-sm"
           style={{
@@ -807,7 +807,7 @@ export function FormBuilderPage() {
         >
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h2 className="text-lg font-semibold" style={{ color: t.text }}>
+              <h2 className="text-lg" style={{ color: t.text }}>
                 Registration banner
               </h2>
               <p className="text-sm" style={{ color: t.textMuted }}>
@@ -1083,6 +1083,7 @@ export function FormBuilderPage() {
                 onExpand={setExpandedId}
                 t={t}
                 locked={locked}
+                live={isLive}
                 readOnly={readOnly}
                 onUpdate={
                   readOnly ? () => {} : (patch) => updateField_(f.id, patch)
