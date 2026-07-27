@@ -26,8 +26,8 @@ export function StaffDashboardPage() {
             </p>
             <h1 className="mt-3 text-3xl  tracking-tight">On-site Support</h1>
             <p className="mt-2 max-w-2xl text-sm text-brand-lime-100/80">
-              Quickly join live events and support registrations without
-              administrative controls.
+              Open assigned events, assist attendees with registration, and
+              support live event operations without managing system settings.
             </p>
           </div>
           <div className="hidden h-32 w-32 overflow-hidden rounded-[1.75rem] border border-white/10 shadow-lg lg:block">

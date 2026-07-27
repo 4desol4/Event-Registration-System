@@ -37,14 +37,14 @@ export function SuperAdminDashboardPage() {
               Control Center
             </h1>
             <p className="mt-3 max-w-2xl text-base text-brand-lime-100/90 sm:text-lg">
-              Manage accounts, audit activity, and maintain event operations
-              from one powerful command hub.
+              Oversee platform access, monitor event activity, and keep the
+              registration system running smoothly from a single control hub.
             </p>
           </div>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             <div className="rounded-3xl border border-white/10 bg-white/10 p-4 backdrop-blur-xl transition-all hover:-translate-y-1">
               <p className="text-xs uppercase tracking-[0.24em] text-brand-lime-200">
-                Total accounts
+                Platform accounts
               </p>
               <p className="mt-3 text-3xl font-semibold text-white">
                 {usersCount ?? "—"}
@@ -60,7 +60,7 @@ export function SuperAdminDashboardPage() {
             </div>
             <div className="rounded-3xl border border-white/10 bg-white/10 p-4 backdrop-blur-xl transition-all hover:-translate-y-1">
               <p className="text-xs uppercase tracking-[0.24em] text-brand-lime-200">
-                Latest review
+                System status
               </p>
               <p className="mt-3 text-3xl font-semibold text-white">Live</p>
             </div>
@@ -75,7 +75,7 @@ export function SuperAdminDashboardPage() {
             </div>
             <div>
               <p className="text-sm text-brand-dark-500 dark:text-brand-dark-300">
-                Total Accounts
+                Platform Accounts
               </p>
               <div className="mt-1 text-2xl font-bold text-brand-dark-900 dark:text-brand-lime-50">
                 {usersCount ?? "—"}
@@ -106,10 +106,10 @@ export function SuperAdminDashboardPage() {
         >
           <div>
             <p className="text-sm text-brand-dark-500 dark:text-brand-dark-300">
-              Manage Accounts
+              Account Access
             </p>
             <div className="mt-1 text-lg font-medium text-brand-dark-900 dark:text-brand-lime-50">
-              Open Staff Accounts
+              Open staff and admin management
             </div>
           </div>
           <FileText />
@@ -119,20 +119,21 @@ export function SuperAdminDashboardPage() {
       <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
         <div className="rounded-2xl border border-brand-dark-100 bg-white p-4 dark:border-brand-dark-800 dark:bg-brand-dark-900">
           <h3 className="font-medium text-brand-dark-900 dark:text-brand-lime-50">
-            Recent Audits
+            Recent Activity
           </h3>
           <p className="mt-3 text-sm text-brand-dark-500 dark:text-brand-dark-300">
-            Audit trail links are available in the backend. Use the API to fetch
-            the latest logs.
+            Review the latest platform activity and user actions to keep
+            operations transparent and secure.
           </p>
         </div>
 
         <div className="rounded-2xl border border-brand-dark-100 bg-white p-4 dark:border-brand-dark-800 dark:bg-brand-dark-900">
           <h3 className="font-medium text-brand-dark-900 dark:text-brand-lime-50">
-            System Actions
+            Platform Administration
           </h3>
           <p className="mt-3 text-sm text-brand-dark-500 dark:text-brand-dark-300">
-            Quick tools for seeding, maintenance, and exporting system data.
+            Use this space for maintenance tasks, data exports, and broader
+            system administration needs.
           </p>
         </div>
       </div>
@@ -141,12 +142,11 @@ export function SuperAdminDashboardPage() {
       <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3 items-start">
         <div className="md:col-span-2 space-y-4">
           <h2 className="text-xl font-bold text-brand-dark-900 dark:text-brand-lime-50">
-            Super Admin Capabilities
+            Super Admin Responsibilities
           </h2>
           <p className="text-sm text-brand-dark-500 dark:text-brand-dark-300">
-            Full control is organized for quick review. Access account
-            management, audit workflows, export tools, and maintenance from one
-            place.
+            Full platform oversight is arranged here so you can manage access,
+            review activity, and support event operations efficiently.
           </p>
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -156,11 +156,11 @@ export function SuperAdminDashboardPage() {
               </div>
               <div>
                 <p className="text-sm font-medium text-brand-dark-900 dark:text-brand-lime-50">
-                  Manage Accounts
+                  Manage Access
                 </p>
                 <p className="text-xs text-brand-dark-500 dark:text-brand-dark-300">
                   Create, activate, deactivate, and assign roles to staff and
-                  admins.
+                  administrators.
                 </p>
               </div>
             </div>
@@ -171,11 +171,11 @@ export function SuperAdminDashboardPage() {
               </div>
               <div>
                 <p className="text-sm font-medium text-brand-dark-900 dark:text-brand-lime-50">
-                  View Audits
+                  Review Activity
                 </p>
                 <p className="text-xs text-brand-dark-500 dark:text-brand-dark-300">
-                  Inspect system and user activity logs for compliance and
-                  troubleshooting.
+                  Inspect system and user activity logs for compliance,
+                  auditing, and troubleshooting.
                 </p>
               </div>
             </div>
@@ -186,10 +186,10 @@ export function SuperAdminDashboardPage() {
               </div>
               <div>
                 <p className="text-sm font-semibold text-brand-dark-900 dark:text-brand-lime-50">
-                  System Overview
+                  Platform Overview
                 </p>
                 <p className="text-xs text-brand-dark-500 dark:text-brand-dark-300">
-                  Real-time metrics and audit snapshots across the platform.
+                  Keep track of live events, active users, and platform health.
                 </p>
               </div>
             </div>

@@ -33,8 +33,8 @@ export function AdminDashboardPage() {
               Administrator Overview
             </h1>
             <p className="mt-3 max-w-2xl text-sm text-brand-dark-600 dark:text-brand-dark-300">
-              Quickly monitor active programs, staff activity, and event
-              readiness with animated insight cards and fast links.
+              Monitor your unit's active programs, support staff activity, and
+              event readiness with clear tools for day-to-day administration.
             </p>
           </div>
           <div className="hidden md:block rounded-3xl border border-brand-dark-100 bg-white/80 p-4 shadow-lg shadow-brand-dark-900/10 dark:border-brand-dark-700 dark:bg-brand-dark-950/80">
@@ -56,7 +56,7 @@ export function AdminDashboardPage() {
             {events.length}
           </p>
           <p className="mt-2 text-xs text-brand-dark-400 dark:text-brand-dark-400">
-            Live and scheduled programs visible to your unit.
+            Programs currently visible to your unit and ready for coordination.
           </p>
         </div>
         <div className="group rounded-[1.75rem] border border-brand-dark-100 bg-white p-6 shadow-lg transition-transform hover:-translate-y-1 dark:border-brand-dark-800 dark:bg-brand-dark-900">
@@ -67,7 +67,7 @@ export function AdminDashboardPage() {
             {usersCount ?? "—"}
           </p>
           <p className="mt-2 text-xs text-brand-dark-400 dark:text-brand-dark-400">
-            Active administrators and staff members.
+            Staff and administrators assigned to your unit.
           </p>
         </div>
         <Link
@@ -79,7 +79,7 @@ export function AdminDashboardPage() {
           </p>
           <div className="mt-4 flex items-center justify-between gap-2">
             <span className="text-lg font-semibold text-brand-dark-900 dark:text-brand-lime-50">
-              Open
+              Manage staff access
             </span>
             <ChevronRight className="text-brand-dark-400" />
           </div>
@@ -92,7 +92,7 @@ export function AdminDashboardPage() {
             Recent events
           </h2>
           <p className="text-sm text-brand-dark-500 dark:text-brand-dark-400">
-            Latest programs needing review or support.
+            Programs that need oversight, coordination, or support.
           </p>
         </div>
         <div className="mt-4 grid gap-3">
