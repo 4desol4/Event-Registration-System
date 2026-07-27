@@ -68,15 +68,16 @@ export function buildSubmissionsRouter(io: SocketIOServer) {
           (Array.isArray(value) && value.length === 0);
 
         if (field.type === "yes_no" && field.required) {
-          const isAnswered =
-            value &&
-            typeof value === "object" &&
-            !Array.isArray(value) &&
-            "enabled" in value;
           const yesNoValue = value as Record<string, unknown> | undefined;
+          const isAnswered =
+            yesNoValue &&
+            typeof yesNoValue === "object" &&
+            !Array.isArray(yesNoValue) &&
+            "enabled" in yesNoValue &&
+            typeof yesNoValue.enabled === "boolean";
           const hasDetails =
-            !yesNoValue?.enabled ||
-            (Array.isArray(yesNoValue.details)
+            yesNoValue?.enabled === false ||
+            (Array.isArray(yesNoValue?.details)
               ? yesNoValue.details.some(
                   (entry) =>
                     entry &&
@@ -88,7 +89,7 @@ export function buildSubmissionsRouter(io: SocketIOServer) {
                 )
               : false);
 
-          if (!isAnswered || (yesNoValue?.enabled && !hasDetails)) {
+          if (!isAnswered || (yesNoValue?.enabled === true && !hasDetails)) {
             flagged = true;
             flagReasons.push(
               `"${field.label}" requires a response and at least one detail when set to Yes`,

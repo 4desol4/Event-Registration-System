@@ -177,7 +177,7 @@ export function FieldRenderer({ field, value, error, onChange }: Props) {
             onClick={() =>
               onChange({
                 enabled: false,
-                details: state.entries,
+                details: [],
               })
             }
             className={`rounded-full border px-4 py-2 text-sm font-medium transition-all duration-200 active:scale-95 ${

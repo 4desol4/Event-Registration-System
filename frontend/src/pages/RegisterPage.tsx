@@ -33,10 +33,24 @@ function normalizeYesNoValue(value: unknown) {
   return { enabled: false, entries: [] as Array<Record<string, unknown>> };
 }
 
-function hasMeaningfulYesNoDetails(value: unknown) {
-  const { enabled, entries } = normalizeYesNoValue(value);
-  if (!enabled) return true;
+function isYesNoChoice(
+  value: unknown,
+): value is { enabled: boolean; details?: unknown } {
+  return Boolean(
+    value &&
+    typeof value === "object" &&
+    !Array.isArray(value) &&
+    "enabled" in value &&
+    typeof (value as Record<string, unknown>).enabled === "boolean",
+  );
+}
 
+function hasMeaningfulYesNoDetails(value: unknown) {
+  if (!isYesNoChoice(value)) return false;
+
+  if ((value as Record<string, unknown>).enabled === false) return true;
+
+  const { entries } = normalizeYesNoValue(value);
   return entries.some((entry) =>
     Object.values(entry ?? {}).some(
       (detail) => String(detail ?? "").trim().length > 0,
@@ -112,8 +126,7 @@ export function RegisterPage() {
         (Array.isArray(value) && value.length === 0);
 
       if (field.type === "yes_no") {
-        const isAnswered =
-          typeof value === "object" && value !== null && "enabled" in value;
+        const isAnswered = isYesNoChoice(value);
 
         if (field.required && !isAnswered) {
           errors[field.id] = `${field.label} is required`;
@@ -121,7 +134,8 @@ export function RegisterPage() {
         }
 
         if (field.required && isAnswered && !hasMeaningfulYesNoDetails(value)) {
-          errors[field.id] = `${field.label} requires at least one detail`;
+          errors[field.id] =
+            `${field.label} requires at least one detail when set to Yes`;
           continue;
         }
 
