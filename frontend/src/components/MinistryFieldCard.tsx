@@ -102,7 +102,7 @@ export function MinistryFieldCard({
       <button
         type="button"
         onClick={() => onExpand(expanded ? null : field.id)}
-        className="flex w-full items-center gap-2 rounded-2xl px-3 py-3 text-left sm:gap-3 sm:px-4 sm:py-3.5"
+        className="flex w-full items-start gap-2 rounded-2xl px-3 py-3 text-left sm:gap-3 sm:px-4 sm:py-3.5"
       >
         <span
           className="cursor-grab opacity-40 hover:opacity-70"
@@ -123,14 +123,14 @@ export function MinistryFieldCard({
         </div>
         <div className="min-w-0 flex-1">
           <p
-            className="truncate text-[13px] font-semibold sm:text-base"
+            className="break-words whitespace-normal text-[13px] font-semibold sm:text-base"
             style={{ color: t.text, fontFamily: "Manrope, sans-serif" }}
           >
             {field.label || "Untitled question"}
             {field.required && <span style={{ color: t.gold }}> *</span>}
           </p>
           <p
-            className="truncate text-[10px] sm:text-xs"
+            className="break-words whitespace-normal text-[10px] sm:text-xs"
             style={{ color: t.textFaint }}
           >
             {config.label}
