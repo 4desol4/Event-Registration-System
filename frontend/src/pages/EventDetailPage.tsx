@@ -113,7 +113,7 @@ export function EventDetailPage() {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          {canManage && event.forms.length > 0 && (
+          {canManage && (event.forms?.length ?? 0) > 0 && (
             <button
               onClick={handleExport}
               disabled={exporting}
@@ -163,7 +163,7 @@ export function EventDetailPage() {
         </div>
       )}
 
-      {event.forms.length === 0 ? (
+      {(event.forms?.length ?? 0) === 0 ? (
         <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-brand-dark-200 dark:border-brand-dark-700 py-16 text-center animate-slide-up">
           <FileText
             size={32}
@@ -183,7 +183,7 @@ export function EventDetailPage() {
         </div>
       ) : (
         <div className="grid gap-3 sm:grid-cols-2">
-          {event.forms.map((form, i) => (
+          {event.forms?.map((form, i) => (
             <Link
               key={form.id}
               to={`/forms/${form.id}`}

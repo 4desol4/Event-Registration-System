@@ -170,8 +170,8 @@ export function EventsListPage() {
                         day: "numeric",
                       })}
                       {" · "}
-                      {event.forms.length} form
-                      {event.forms.length !== 1 ? "s" : ""}
+                      {event.forms?.length ?? 0} form
+                      {(event.forms?.length ?? 0) !== 1 ? "s" : ""}
                     </p>
                   </div>
                 </Link>

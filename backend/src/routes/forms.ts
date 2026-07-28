@@ -94,7 +94,7 @@ formsRouter.get(
   }),
 );
 
-// PATCH /forms/:id — update title/description/banner (structural field edits go through /fields)
+// PATCH /forms/:id — update title/description/banner/status (structural field edits go through /fields)
 formsRouter.patch(
   "/:id",
   authenticate,
@@ -107,6 +107,7 @@ formsRouter.patch(
       "wifiEnabled",
       "wifiSsid",
       "wifiPassword",
+      "status",
     ];
     const data: Record<string, unknown> = {};
     for (const key of allowed) {

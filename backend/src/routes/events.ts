@@ -110,10 +110,35 @@ eventsRouter.patch(
   "/:id",
   asyncHandler(async (req, res) => {
     const data = updateEventSchema.parse(req.body);
+
     const event = await prisma.event.update({
       where: { id: req.params.id },
       data,
+      include: {
+        forms: {
+          select: { id: true, title: true, status: true, shortSlug: true },
+        },
+      },
     });
+
+    if (data.status === "closed") {
+      await prisma.form.updateMany({
+        where: { eventId: event.id },
+        data: { status: "closed" },
+      });
+      // Refresh the event so forms reflect the closed status.
+      const refreshed = await prisma.event.findUnique({
+        where: { id: req.params.id },
+        include: {
+          forms: {
+            select: { id: true, title: true, status: true, shortSlug: true },
+          },
+        },
+      });
+      if (!refreshed) throw new ApiError(404, "Event not found");
+      return res.json(refreshed);
+    }
+
     res.json(event);
   }),
 );
